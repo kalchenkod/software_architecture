@@ -1,14 +1,13 @@
 from flask import Flask
-from flask_restful import Api, reqparse, Resource
+from flask_restful import Api
 import consul
-import json
 
-from facade_app.resources.facade_resource import Facade
+from message_app.resources.message_resource import Message
 
 app = Flask(__name__)
 api = Api(app)
 
-api.add_resource(Facade, "/facade")
+api.add_resource(Message, "/message")
 
 
 def get_id(consul_agent):
@@ -33,10 +32,10 @@ if __name__ == '__main__':
 
     # register service
     service_id = get_id(c)
-    c.agent.service.register('facade_service', service_id=service_id, port=5054, address='127.0.0.1')
+    c.agent.service.register('messaging_service', service_id=service_id, port=5055, address='127.0.0.1')
 
     # run app
     try:
-        app.run(port=5054)
+        app.run(port=5055)
     except:
         c.agent.service.deregister(service_id)

@@ -1,14 +1,13 @@
 from flask import Flask
 from flask_restful import Api, reqparse, Resource
 import consul
-import json
 
-from facade_app.resources.facade_resource import Facade
+from logging_app.resources.logging_resource import Logging
 
 app = Flask(__name__)
 api = Api(app)
 
-api.add_resource(Facade, "/facade")
+api.add_resource(Logging, "/logging")
 
 
 def get_id(consul_agent):
@@ -28,15 +27,15 @@ if __name__ == '__main__':
     c = consul.Consul(host='localhost', port=8500)
 
     # set message queue name if does not exist
-    if c.kv.get('mq_name')[1] is None:
-        c.kv.put('mq_name', 'hazelcast_queue')
+    if c.kv.get('distributed_map_name')[1] is None:
+        c.kv.put('distributed_map_name', 'hazelcast_map')
 
     # register service
     service_id = get_id(c)
-    c.agent.service.register('facade_service', service_id=service_id, port=5054, address='127.0.0.1')
+    c.agent.service.register('logging_service', service_id=service_id, port=5057, address='127.0.0.1')
 
     # run app
     try:
-        app.run(port=5054)
+        app.run(port=5057)
     except:
         c.agent.service.deregister(service_id)

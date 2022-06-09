@@ -1,15 +1,17 @@
 from flask import request
 from flask_restful import Resource, reqparse
 
-from message_app.services.static_response_service import StaticResponse
+from message_app.services.storage import Storage
 
 
 class Message(Resource):
+    storage = Storage()
+
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
 
         super(Message, self).__init__()
 
     def get(self):
-        static_response = StaticResponse.get_static_response()
-        return static_response, 200
+        messages = self.storage.get_all()
+        return messages, 200
